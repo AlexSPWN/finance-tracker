@@ -1,7 +1,9 @@
+import type { Role } from "../types/UserProfile";
+
 type JWT = {
     nameid?: string;
     email?: string;
-    role?: string;
+    role?: Role;
     exp?: number;
     iat?: number;
     nbf?: number;

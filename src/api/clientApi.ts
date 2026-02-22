@@ -7,6 +7,12 @@ export const setAccessToken = (token: string | null) => {
     accessToken = token;
 }
 
+let onUnauthorized: (() => void) | null = null;
+
+export const setOnUnathorized = (callback: () => void) => {
+    onUnauthorized = callback;
+}
+
 let refreshPromise: Promise<string | null> | null = null; // deduplicate refresh calls
 
 export const apiFetch = async <T>(input: RequestInfo, init?: RequestInit, retry = true): Promise<T | null> => {
@@ -46,6 +52,7 @@ export const apiFetch = async <T>(input: RequestInfo, init?: RequestInit, retry 
         const newToken = await refreshPromise;
 
         if(!newToken) {
+            onUnauthorized?.();
             throw new Error("Unauthorized");
         }
 

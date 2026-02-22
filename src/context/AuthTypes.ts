@@ -1,8 +1,10 @@
+import type { Role } from "../types/UserProfile";
+
 export type AuthState = {
     isAuthenticated: boolean;
-    role: string;
+    role: Role | undefined;
     isLoading: boolean;
 }
 export type AuthAction =
-| {type: "login", payload: { isAuthenticated: boolean, role: string, isLoading: boolean }}
+| {type: "login", payload: { isAuthenticated: boolean, role: Role | undefined, isLoading: boolean }}
 | {type: "logout"}

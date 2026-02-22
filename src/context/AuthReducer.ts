@@ -11,7 +11,7 @@ export const AuthReducer = (state: AuthState, action: AuthAction):AuthState => {
         case "logout":
             return {
                 isAuthenticated: false,
-                role: "",
+                role: undefined,
                 isLoading: false
             }
         default:
