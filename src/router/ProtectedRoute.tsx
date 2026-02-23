@@ -9,9 +9,9 @@ type Props = {
 export const ProtectedRoute = ({children}: Props) => {
     const {state} = useAuthContext();
     const location = useLocation();
-    if(state.isLoading) {
+    /* if(state.isLoading) {
         return <h2>Loading ...</h2>;
-    }
+    } */
     if(!state.isAuthenticated) {
         return <Navigate to="/login" replace state={{from: location}} />
     }

@@ -79,6 +79,10 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
         dispatch({ type: "logout" });
     };
 
+    if (state.isLoading) {
+        return <div>Initializing app...</div>;
+    }
+
     return (
         <AuthContext.Provider value={{state, login, logout}}>
             {children}
