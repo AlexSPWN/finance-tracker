@@ -4,11 +4,10 @@ export const normalizeEmail = (email: string): string => {
 
 export const isValidEmail = (email: string): boolean => {
     const maxLength = 100;
-    const normEmail = normalizeEmail(email);
     
-    const isInvalidLength = !normEmail || normEmail.length < 3 || normEmail.length > maxLength;
+    const isInvalidLength = !email || email.length < 3 || email.length > maxLength;
     if(isInvalidLength) return false;
     
     const regExp: RegExp = /[^\s@]+@[^\s@]+\.[^\s@]+/;
-    return regExp.test(normEmail);
+    return regExp.test(email);
 }

@@ -80,7 +80,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     };
 
     if (state.isLoading) {
-        return <div>Initializing app...</div>;
+        return <h2>Loading ...</h2>;
     }
 
     return (
