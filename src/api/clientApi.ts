@@ -1,3 +1,5 @@
+import { getDeviceId } from "../utils/deviceId";
+
 const apiUrl = import.meta.env.VITE_FINTRACK_API;
 
 // store token in a memory
@@ -31,16 +33,23 @@ export const apiFetch = async <T>(input: RequestInfo, init?: RequestInit, retry 
 
     //If Unauthorized
     if(res.status === 401 && retry) {
-        
+        const deviceId = getDeviceId();
         if(!refreshPromise) {
             refreshPromise = (async () => {                
                 //In case the browser or tab was closed
                 const refreshRes = await fetch(`${apiUrl}/auth/refresh`, {
                     method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({deviceId}),
                     credentials: "include"
                 });
             
-                if(!refreshRes.ok) return null;
+                if(!refreshRes.ok) 
+                {
+                    const text = await refreshRes.text();
+                    console.error("Refresh failed:", text);
+                    return null;
+                }
                 const data = await refreshRes.json();
                 setAccessToken(data.accessToken);
                 return data.accessToken;  
