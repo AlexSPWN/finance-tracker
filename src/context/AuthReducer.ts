@@ -5,12 +5,14 @@ export const AuthReducer = (state: AuthState, action: AuthAction):AuthState => {
         case "login":
             return {
                 isAuthenticated: action.payload.isAuthenticated,
+                userEmail: action.payload.userEmail,
                 role: action.payload.role,
                 isLoading: action.payload.isLoading
             }
         case "logout":
             return {
                 isAuthenticated: false,
+                userEmail: undefined,
                 role: undefined,
                 isLoading: false
             }

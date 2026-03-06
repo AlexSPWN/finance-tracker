@@ -7,7 +7,7 @@ export const useLoginFormValidation = (form: LoginForm) => {
         const errors: ErrorFields = {};
 
         if(!isValidEmail(form.email)) {
-            errors.email = "Wromg email format";
+            errors.email = "Wrong email format";
         }
 
         if(!form.password || form.password.length === 0 ) {

@@ -3,7 +3,7 @@ import { useRegisterForm } from "../hooks/useRegisterForm";
 import { useLocation, useNavigate } from "react-router";
 import { regService } from "../services/regService";
 
-export const RegisterForm = () => {
+export const SignUpForm = () => {
 
     const {form, errors, isValid, pwdStrength, touched, 
         reset, handleChange, handleBlur, handleSubmit} = useRegisterForm()
@@ -51,50 +51,66 @@ export const RegisterForm = () => {
 
     return (
         <>
-            <form onSubmit={onSubmit}>
-                <div>
-                    <label>
+            <form onSubmit={onSubmit} 
+            className="rounded-xl bg-blue-50 p-5  w-1/3 max-w-lg"
+            >
+                <div className="mt-2 text-left">
+                    <label className="flex flex-col">
                     Email:
                     <input 
                         type="email" 
                         name="email" 
                         value={form.email}
+                        className="bg-gray-50 rounded py-1 px-2 focus:outline-none focus:bg-white"
                         onBlur={handleBlur}
                         onChange={onChange}
                     />
                     </label>
-                    {touched.email && errors.email && <div>{errors.email}</div>}
+                    <div className="text-red-500 text-sm ps-1">
+                        {touched.email && errors.email && <div>{errors.email}</div>}
+                    </div>
                 </div>
-                <div>
-                    <label>
+                <div className="mt-2 text-left">
+                    <label className="flex flex-col">
                     Password:
-                    <input 
-                        type={pwdInputType ? "password" : "text"}
-                        name="password"
-                        value={form.password}
-                        onBlur={handleBlur}
-                        onChange={onChange}
-                    />
-                    <button type="button" onClick={handleToggle}>{pwdInputType ? "Show" : "Hide"}</button>
+                    <div className="flex">
+                        <input 
+                            type={pwdInputType ? "password" : "text"}
+                            name="password"
+                            value={form.password}
+                            className="bg-gray-50 grow rounded py-1 px-2 focus:outline-none focus:bg-white"
+                            onBlur={handleBlur}
+                            onChange={onChange}
+                        />
+                        <button type="button" onClick={handleToggle}>{pwdInputType ? "Show" : "Hide"}</button>
+                    </div>
                     </label>
-                    {touched.password && errors.password && <div>{errors.password}</div>}
-                    
+                     <div className="text-red-500 text-sm ps-1">
+                        {touched.password && errors.password && <div>{errors.password}</div>}
+                     </div>                    
                 </div>
-                <div>
-                    <label>
+                <div className="mt-2 text-left">
+                    <label className="flex flex-col">
                     Confirm password:
                     <input 
                         type="password" 
                         name="repassword"
                         value={form.repassword}
+                        className="bg-gray-50 rounded py-1 px-2 focus:outline-none focus:bg-white"
                         onBlur={handleBlur}
                         onChange={onChange}
                     />
                     </label>
-                    {touched.repassword && errors.repassword && <div>{errors.repassword}</div>}
+                     <div className="text-red-500 text-sm ps-1">
+                        {touched.repassword && errors.repassword && <div>{errors.repassword}</div>}
+                     </div>
                 </div>
-                <div>
-                    <button type="submit" disabled={!isValid || isSubmitting}>{isSubmitting ? "Registering" : "Register"}</button>
+                <div className="flex justify-center mt-5 space-x-2">
+                    <button 
+                        type="submit" 
+                        disabled={!isValid || isSubmitting}
+                        className="bg-[#615fff] hover:opacity-80 hover:text-white hover:cursor-pointer font-bold text-amber-50 rounded-xl px-10 py-2 disabled:bg-gray-200 disabled:text-gray-500"
+                    >{isSubmitting ? "Registering" : "Register"}</button>
                 </div>
             </form>
             {regError && <div>{regError}</div>}

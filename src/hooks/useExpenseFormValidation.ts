@@ -28,8 +28,16 @@ export const useExpenseFormValidation = (form: ExpenseFormProps) => {
         if(!form.category) {
             errors.category = "Category is required"
         }
+
+        if(!form.type) {
+            errors.type = "Type is required"
+        }
+
+        if(form.expDate === "") {
+            errors.expDate = "Date is required"
+        }
         const isValid = Object.keys(errors).length === 0;
 
         return {errors, isValid}
-    }, [form.name, form.amount, form.category])
+    }, [form])
 }

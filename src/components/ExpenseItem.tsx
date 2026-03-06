@@ -36,27 +36,47 @@ export const ExpenseItem = memo(({expense, current, updateCurrent, remove, pendi
                 />
             </Modal>
         )}
-        <div style={{
+        <div className="even:bg-gray-50" style={{
               opacity: expense.deleting ? 0.5 : 1,
               textDecoration: expense.deleting ? 'line-through' : 'none',
               transition: 'opacity 0.2s'
             }} >
-            {expense.id} | {expense.name} | {expense.category} | {expense.amount} 
-            {expense.adding && <div>Adding...</div>}
-            {expense.updating && <div>Updating...</div>}
-        </div>
-        {!expense.deleting && 
-            <button 
-                type="button" 
-                disabled={pending.update || (current && current.id === expense.id)} 
-                onClick={() => updateCurrent(expense)}>
-                Edit
-            </button>
-        }
-        <button 
-            type="button" 
-            disabled={expense.deleting} 
-            onClick={handleDelete}>{expense.deleting ? "Deleting" : "Delete" } 
-        </button>
+            <div className="grid grid-cols-5 items-center py-2">
+                <div className="px-1">
+                    {new Date(expense.expDate).toLocaleDateString()}
+                </div>
+                <div className="px-1">
+                    {expense.name}
+                </div>
+                <div className="px-1">
+                    {expense.category}
+                </div>
+                <div className="px-1">
+                    {expense.amount} 
+                </div>
+                <div className="px-1">
+                {!expense.deleting && 
+                    <button 
+                        type="button" 
+                        disabled={pending.update || (current && current.id === expense.id)} 
+                        onClick={() => updateCurrent(expense)}
+                        className="bg-[#615fff] hover:opacity-80 hover:text-white hover:cursor-pointer font-bold text-amber-50 rounded-xl px-4 py-2 me-1 disabled:bg-gray-200 disabled:text-gray-500"
+                    >
+                        Edit
+                    </button>
+                }
+                <button 
+                    type="button" 
+                    disabled={expense.deleting} 
+                    onClick={handleDelete}
+                    className="bg-[#eb7895] hover:opacity-80 hover:text-white hover:cursor-pointer font-bold text-amber-50 rounded-xl px-4 py-2 me-1 disabled:bg-gray-200 disabled:text-gray-500"
+                >
+                    {expense.deleting ? "Deleting" : "Delete" }   
+                </button>
+                {expense.adding && <div>Adding...</div>}
+                {expense.updating && <div>Updating...</div>}
+                </div>
+            </div>            
+        </div>        
     </>);
 });

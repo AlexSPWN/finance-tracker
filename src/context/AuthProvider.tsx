@@ -14,6 +14,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
 
     const [state, dispatch] = useReducer(AuthReducer, {
         isAuthenticated: false,
+        userEmail: undefined,
         role: undefined,
         isLoading: true
     });
@@ -43,6 +44,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
                         type: "login",
                         payload: {
                             isAuthenticated: true,
+                            userEmail: parseJwt(data.accessToken).email || undefined,
                             role: parseJwt(data.accessToken).role || undefined,
                             isLoading: false
                         }
@@ -67,6 +69,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
             type: "login",
             payload: {
                 isAuthenticated: true,
+                userEmail: parseJwt(data.accessToken).email || undefined,
                 role: parseJwt(data.accessToken).role || undefined,
                 isLoading: false
             }

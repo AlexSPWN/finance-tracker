@@ -1,16 +1,23 @@
 export const Categories = ["Food", "Transport", "Entertainment", "Other"] as const;
-
+export const TypeList = ["income", "expense"] as const;
+export type ExpType = typeof TypeList[number];
 export type Expense = {
     id: string;
     name: string;
     category: string;
+    type: ExpType;
     amount: number;
+    expDate: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type ExpenseExt = Expense & {adding?: boolean, updating?: boolean, deleting?: boolean};
 
-export type ExpenseFormProps = Omit<Expense, "id" | "amount"> & {
-    amount: string | undefined
+export type ExpenseFormProps = Omit<Expense, 
+    "id" | "amount" | "type" | "createdAt" | "updatedAt"> & {
+    amount: string | undefined,
+    type: ExpType | undefined
 }
 
 export type ErrorFields = Partial<Record<keyof ExpenseFormProps, string>>

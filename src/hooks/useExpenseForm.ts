@@ -5,7 +5,9 @@ import { useExpenseFormValidation } from "./useExpenseFormValidation";
 const emptyForm: ExpenseFormProps = {
     name: "",
     category: "",
-    amount: undefined
+    type: undefined,
+    amount: undefined,
+    expDate: new Date().toISOString().substring(0, 10)
 }
 type Props = {
     current: Expense | undefined;
@@ -20,7 +22,9 @@ export const useExpenseForm = ({current, updateCurrent}: Props) => {
                 setForm({
                     name: current.name,
                     category: current.category,
-                    amount: current.amount.toString()
+                    type: current.type,
+                    amount: current.amount.toString(),
+                    expDate: current.expDate
                 });
             } else {
                 setForm(emptyForm);
@@ -37,7 +41,9 @@ export const useExpenseForm = ({current, updateCurrent}: Props) => {
         setTouched({
             name: true,
             category: true,
-            amount: true
+            amount: true,
+            type: true,
+            expDate: true
         });
         if(!isValid) return null;
         return form;
@@ -50,6 +56,7 @@ export const useExpenseForm = ({current, updateCurrent}: Props) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const {name, value} = e.target;
+        console.log(value);
         if(name == "amount") {
             if(value === "") {
                 setForm(prev => ({
@@ -76,6 +83,12 @@ export const useExpenseForm = ({current, updateCurrent}: Props) => {
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+
+        setTouched(prev => ({
+            ...prev,
+            [name] : true
+        }));
+
         if (name === "amount") {
             if (!value) return;
             const num = Number(value);
@@ -85,12 +98,7 @@ export const useExpenseForm = ({current, updateCurrent}: Props) => {
                 ...prev,
                 amount: formatted
             }));            
-        }
-
-        setTouched(prev => ({
-            ...prev,
-            [name] : true
-        }));
+        }        
     }
 
     const handleClear = () => {

@@ -109,13 +109,13 @@ export const useExpenses = () => {
     const add = async (expense: ExpenseFormProps) => {
         handlePending("add", true);
         handleError("add", undefined);
-        const tmpExpense: Expense = {...expense, amount: Number(expense.amount!), id: crypto.randomUUID()};
+        const tmpExpense: Expense = {...expense, type: expense.type!, amount: Number(expense.amount!), id: crypto.randomUUID()};
 
         startTransition(async () => {
             dispatch({type: "Add", payload: tmpExpense });
             try {
                 await new Promise((res) => setTimeout(res, 1000));
-                const newExpense = await expenseService.add(expense);
+                const newExpense = await expenseService.add({...expense, expDate: new Date(expense.expDate).toISOString()});
                 setExpenses(prev => ([newExpense, ...prev]));
                 handlePending("add", false);
                 setCurrentPage(1);
@@ -134,7 +134,7 @@ export const useExpenses = () => {
         startTransition(async() => {
             dispatch({type: "Update", payload: expense})
             try {
-                await expenseService.update(expense.id, {...expense, amount: String(expense.amount)});
+                await expenseService.update(expense.id, {...expense, amount: String(expense.amount), expDate: new Date(expense.expDate).toISOString()});
                 setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));
                 setCurrent(prev => prev?.id === expense.id ? undefined : prev);
             } catch (err) {
@@ -167,7 +167,14 @@ export const useExpenses = () => {
     }, [dispatch]); //currentPage, expenses.length
 
     const updateCurrent = useCallback((expense: Expense | undefined) => {
-        setCurrent(expense);
+        //console.log(expense);
+        //const tmpDate = expense ? expense.expDate.substring(0, 10) : new Date().toISOString().substring(0, 10);
+
+        if(expense) {
+            setCurrent({...expense, expDate: expense.expDate.substring(0,10)});
+        } else {
+            setCurrent(undefined);
+        }
     }, [])
 
     return {expenses: optimisticExpenses, 
