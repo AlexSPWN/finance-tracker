@@ -18,7 +18,7 @@ This project was built as a portfolio application to showcase modern frontend de
 - Context + reducer state management for authentication
 
 ## Screenshot
-![image]()
+![image](https://github.com/AlexSPWN/finance-tracker/blob/main/src/assets/Screenshot.png)
 
 ## Tech Stack
 ### Frontend
@@ -47,9 +47,7 @@ This project was built as a portfolio application to showcase modern frontend de
 - Environment-based configuration
 
 ## Project Architecture
-
-src/
-
+```bash
 src
 ├── api            # API communication layer
 ├── services       # Business logic layer
@@ -60,7 +58,7 @@ src
 ├── router         # Application routing
 ├── types          # TypeScript types
 └── utils          # Helper utilities
-
+```
 Typical data flow:
 
 Component → Hook → Service → API → Backend
@@ -87,18 +85,19 @@ The application uses JWT-based authentication.
 ## Installation
 
 Clone the repository:
-
+```bash
 git clone git@github.com:AlexSPWN/finance-tracker.git
 cd finance-tracker
+```
 
 Install dependencies:
-
+```bash
 npm install
-
+```
 Run the development server:
-
+```bash
 npm run dev
-
+```
 ## Future Improvements
 
 - Expense search, filtering
