@@ -14,7 +14,7 @@ export const Pagination = ({pagination, goToPage} : Props) => {
     }
 
     return (<div className="flex justify-start py-5">
-        {pages.length === 1 ? "" : 
+        {pages.length < 1 ? "" : 
             (<>
             <button 
                 type="button" 
