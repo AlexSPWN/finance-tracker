@@ -1,0 +1,46 @@
+.up {
+    display: flex;
+    flex-direction: column;
+    line-height: 10px;
+    gap: 2px
+}
+.up::before {
+    content: "▴";
+    color: black;
+}
+
+.up::after {
+    content: "▾";
+    color: gray;
+}
+
+.down {
+    display: flex;
+    flex-direction: column;
+    line-height: 10px;
+    gap: 2px
+}
+.down::before {
+    content: "▴";
+    color: gray;
+}
+.down::after {
+    content: "▾";
+    color: black;
+}
+
+.default {
+    display: flex;
+    flex-direction: column;
+    line-height: 10px;
+    gap: 2px
+}
+.default::before {
+    content: "▴";
+    color: gray;
+}
+.default::after {
+    content: "▾";
+    color: gray;
+}
+

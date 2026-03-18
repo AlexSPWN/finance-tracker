@@ -30,3 +30,10 @@ export type ExpenseResponse = {
     totalItems: number;
     totalPages: number;
 }
+
+export type ExpenseQuery = {
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}

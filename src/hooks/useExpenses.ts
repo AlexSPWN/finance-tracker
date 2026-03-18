@@ -1,10 +1,8 @@
 import { startTransition, useCallback, useEffect, useOptimistic, useState } from "react";
 import { expenseService } from "../services/expenseService";
-import type { Expense, ExpenseExt, ExpenseFormProps } from "../types/Expense";
+import type { Expense, ExpenseExt, ExpenseFormProps, ExpenseQuery } from "../types/Expense";
 import type { ErrorState, Operations, PendingState } from "../types/Operations";
 import type { PaginationProp } from "../types/Pagination";
-
-
 
 const expenseReducer = (
     state: ExpenseExt[],
@@ -19,18 +17,12 @@ const expenseReducer = (
         case "Update":
             return state.map(prev => prev.id === action.payload.id ? {...action.payload, updating: true} : prev)
         case "Remove":
-            //return state.filter(prev => prev.id !== action.payload)
             return state.map(prev => prev.id === action.payload ? {...prev, deleting: true } : prev)
         default:
             return state
     }
 }
-/* type PropsReturn = {
-    expenses: Expense[],
-    pagination: PaginationProp,
-    pending: PendingState,
-    error: ErrorState
-} */
+
 export const useExpenses = () => {
     const [expenses, setExpenses] = useState<ExpenseExt[]>([]);
     const [optimisticExpenses, dispatch] = useOptimistic(expenses, expenseReducer);
@@ -41,15 +33,61 @@ export const useExpenses = () => {
         totalItems: 0,
         totalPages: 0
     });
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(5);
+
+    // query params
+    const [query, setQuery] = useState<ExpenseQuery>({
+        page: 1,
+        pageSize: 5
+    });
+
+    const setCurrentPage = (page: number) => {
+        setQuery(prev => ({...prev, page}));
+    }
+
+    const setPageSize = (pageSize: number) => {
+        setQuery(prev => ({
+            ...prev,
+            page: 1,
+            pageSize
+        }));
+    }
+
+    // sorting by pressing the same column
+    const setSortBy = (sortBy?: string) => {
+        setQuery(prev => {
+            // if new column: start with ASC
+            if (prev.sortBy !== sortBy) {
+                return { ...prev, sortBy, sortOrder: "asc" };
+            }
+            // if the same column: toggle ASC to DESC
+            if (prev.sortOrder === "asc") {
+                return { ...prev, sortOrder: "desc" };
+            }
+            // if DESC: remove sorting
+            return {
+                page: prev.page,
+                pageSize: prev.pageSize
+            };
+        } )
+    }
+
+    /* const setSortOrder = (sortOrder?: "asc" | "desc") => {
+        setQuery(prev => ({...prev, sortOrder}))
+    } */
 
     const [pending, setPending] = useState<PendingState>({
             load: false,
             add: false,
             update: false,
             remove: false
-        });
+    });
+    
+    const handlePending = (key: Operations , value: boolean) => {
+        setPending(prev => ({
+            ...prev,
+            [key]: value
+        }));
+    }
     const [error, setError] = useState<ErrorState>({});
 
     const handleError = (key: Operations, err: unknown) => {
@@ -72,39 +110,30 @@ export const useExpenses = () => {
             }));
         }
     }
-    
-    const handlePending = (key: Operations , value: boolean) => {
-        setPending(prev => ({
-            ...prev,
-            [key]: value
-        }));
-    }
 
-    //return here to fix soft load when expenseslength changes
     useEffect(() => {
         const controller = new AbortController();      
         const getExpenses = async () => {
             handlePending("load", true);
             handleError("load", undefined);
-            try {
-                const expenseReponse = await expenseService.getAll(currentPage, pageSize, controller?.signal);
-                setExpenses(expenseReponse.items);
-                setPagination({
-                    page: expenseReponse.page,
-                    //pageSize: expenses.length !== pageSize ? expenseReponse.pageSize : expenseReponse.pageSize,
-                    pageSize: expenseReponse.pageSize,
-                    totalItems: expenseReponse.totalItems,
-                    totalPages: expenseReponse.totalPages
-                });       
-            } catch (err) {
-                handleError("load", err);
-            } finally {
-                handlePending("load", false)
-            }
+                try {
+                    const expenseReponse = await expenseService.getAllNew(query, controller?.signal);
+                    setExpenses(expenseReponse.items);
+                    setPagination({
+                        page: expenseReponse.page,
+                        pageSize: expenseReponse.pageSize,
+                        totalItems: expenseReponse.totalItems,
+                        totalPages: expenseReponse.totalPages
+                    });       
+                } catch (err) {
+                    handleError("load", err);
+                } finally {
+                    handlePending("load", false)
+                }
         }        
         getExpenses();
         return () => controller.abort();
-    }, [currentPage, pageSize]); //, expenses.length
+    }, [query]);
 
     const add = async (expense: ExpenseFormProps) => {
         handlePending("add", true);
@@ -114,11 +143,13 @@ export const useExpenses = () => {
         startTransition(async () => {
             dispatch({type: "Add", payload: tmpExpense });
             try {
-                await new Promise((res) => setTimeout(res, 1000));
-                const newExpense = await expenseService.add({...expense, expDate: new Date(expense.expDate).toISOString()});
+                const newExpense = await expenseService.add({...expense, expDate: new Date(expense.expDate).toISOString()})
                 setExpenses(prev => ([newExpense, ...prev]));
                 handlePending("add", false);
-                setCurrentPage(1);
+                setQuery(prev => ({
+                    ...prev,
+                    page: 1
+                }));
             } catch (err) {
                 handleError("add", err);
             } finally {
@@ -134,7 +165,7 @@ export const useExpenses = () => {
         startTransition(async() => {
             dispatch({type: "Update", payload: expense})
             try {
-                await expenseService.update(expense.id, {...expense, amount: String(expense.amount), expDate: new Date(expense.expDate).toISOString()});
+                await expenseService.update(expense.id, {...expense, amount: String(expense.amount), expDate: new Date(expense.expDate).toISOString()})
                 setExpenses(prev => prev.map(e => e.id === expense.id ? expense : e));
                 setCurrent(prev => prev?.id === expense.id ? undefined : prev);
             } catch (err) {
@@ -152,24 +183,26 @@ export const useExpenses = () => {
         startTransition(async () => {
             dispatch({type: "Remove", payload: id});
             try {
-                await expenseService.remove(id);
+                await expenseService.remove(id)
                 setExpenses(prev => prev.filter(e => e.id !== id));
+                setQuery(prev => {
+                    const shouldMovePage = prev.page! > 1 && expenses.length === 1;
+                    return {
+                        ...prev,
+                        page: shouldMovePage ? prev.page! - 1 : prev.page
+                    };
+                });
                 setCurrent(prev => prev?.id === id ? undefined : prev);
             } catch (err) {
                 handleError("remove", err);
             } finally {
                 handlePending("remove", false);                
             }
-            /* if(expenses.length === 1 && currentPage > 1) {
-                setCurrentPage(prev => prev -1);
-            } */
+            
         });
-    }, [dispatch]); //currentPage, expenses.length
+    }, [dispatch, expenses.length]);
 
     const updateCurrent = useCallback((expense: Expense | undefined) => {
-        //console.log(expense);
-        //const tmpDate = expense ? expense.expDate.substring(0, 10) : new Date().toISOString().substring(0, 10);
-
         if(expense) {
             setCurrent({...expense, expDate: expense.expDate.substring(0,10)});
         } else {
@@ -177,9 +210,14 @@ export const useExpenses = () => {
         }
     }, [])
 
-    return {expenses: optimisticExpenses, 
+    return {
+        expenses: optimisticExpenses, 
         current, updateCurrent,
         pagination, setCurrentPage, setPageSize, 
+        query, setSortBy, 
+        //setSortOrder,
         add, update, remove,
-        pending, error}
+        pending,
+        error
+    }
 }

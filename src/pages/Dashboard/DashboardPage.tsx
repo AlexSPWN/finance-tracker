@@ -7,6 +7,8 @@ export const DashboardPage = () => {
     const {expenses, current, updateCurrent, 
         add, update, remove,
         pagination, setCurrentPage, setPageSize, 
+        query, setSortBy,
+        // setSortOrder,
         pending, error} = useExpenses();
 
     return (<div className="flex flex-col items-start grow w-full px-1">
@@ -24,6 +26,7 @@ export const DashboardPage = () => {
                     pagination={pagination} 
                     remove={remove}
                     setCurrentPage={setCurrentPage} setPageSize={setPageSize}
+                    query={query} setSortBy={setSortBy}
                     error={error} pending={pending} />
             </div>
         </div>

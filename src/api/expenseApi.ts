@@ -1,4 +1,4 @@
-import type { Expense, ExpenseFormProps, ExpenseResponse } from "../types/Expense";
+import type { Expense, ExpenseFormProps, ExpenseQuery, ExpenseResponse } from "../types/Expense";
 import { apiFetch } from "./clientApi"
 
 const apiURL = "/api/Expenses";
@@ -9,6 +9,20 @@ export const getAllApi = async (page?: number, pageSize?: number, signal?: Abort
      : pageSize ? `?PageSize=${pageSize}` 
      : "";
 
+    return await apiFetch<ExpenseResponse>(`${apiURL}${query}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        signal
+    })
+}
+
+export const getAllNewApi = async (expQuery?: ExpenseQuery, signal?: AbortSignal) => {
+    let query ="";
+    if(expQuery) {
+        query = Object.entries(expQuery).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+        if(query) query = "?" + query;
+    }
+    //console.log(query);
     return await apiFetch<ExpenseResponse>(`${apiURL}${query}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },

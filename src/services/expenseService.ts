@@ -1,10 +1,17 @@
-import { addApi, deleteApi, getAllApi, updateApi } from "../api/expenseApi";
-import type { Expense, ExpenseFormProps, ExpenseResponse } from "../types/Expense";
+import { addApi, deleteApi, getAllApi, getAllNewApi, updateApi } from "../api/expenseApi";
+import type { Expense, ExpenseFormProps, ExpenseQuery, ExpenseResponse } from "../types/Expense";
 
 
 export const expenseService = {
     async getAll(page?: number, pageSize?: number, signal?: AbortSignal): Promise<ExpenseResponse> {
         const res = await getAllApi(page, pageSize, signal);
+        if (!res) {
+            throw new Error("No data received");
+        }
+        return res;
+    },
+    async getAllNew(expQuery?: ExpenseQuery, signal?: AbortSignal): Promise<ExpenseResponse> {
+        const res = await getAllNewApi(expQuery, signal);
         if (!res) {
             throw new Error("No data received");
         }
