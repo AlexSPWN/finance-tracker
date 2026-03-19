@@ -19,7 +19,9 @@ export const getAllApi = async (page?: number, pageSize?: number, signal?: Abort
 export const getAllNewApi = async (expQuery?: ExpenseQuery, signal?: AbortSignal) => {
     let query ="";
     if(expQuery) {
-        query = Object.entries(expQuery).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+        query = Object.entries(expQuery)
+            .filter(([_, value]) => _&& value !== undefined)
+            .map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
         if(query) query = "?" + query;
     }
     //console.log(query);

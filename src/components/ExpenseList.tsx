@@ -3,6 +3,7 @@ import type { ErrorState, PendingState } from "../types/Operations"
 import type { PaginationProp } from "../types/Pagination"
 import { PageSizeSelector } from "./common/PageSizeSelector"
 import { Pagination } from "./common/Pagination"
+import { SearchInput } from "./common/SearchInput"
 import { ExpenseItem } from "./ExpenseItem"
 
 import "./ExpenseList.css";
@@ -17,11 +18,12 @@ type Props = {
     setPageSize: (size: number) => void;
     query: ExpenseQuery;
     setSortBy: (sortBy?: string) => void;
+    setSearch: (searchText?: string) => void;
     //setSortOrder: (sortOrder?: "asc" | "desc" ) => void;
     pending: PendingState,
     error: ErrorState
 }
-export const ExpenseList  = ({expenses, pagination, remove, current, updateCurrent, setCurrentPage, setPageSize, query, setSortBy, pending, error}: Props) => {
+export const ExpenseList  = ({expenses, pagination, remove, current, updateCurrent, setCurrentPage, setPageSize, query, setSortBy, setSearch, pending, error}: Props) => {
      const columns = [
         {label: "Date", field: "expDate", sortable: true},
         {label: "Name", field: "name", sortable: false},
@@ -35,39 +37,45 @@ export const ExpenseList  = ({expenses, pagination, remove, current, updateCurre
             {/* <div>
                 {Object.entries(query).map(([k, v]) => <div key={k}>{k}: {v}</div>)}
             </div> */}
-        <PageSizeSelector currentValue={pagination.pageSize} setPageSize={setPageSize} />
-        {error.remove && <div style={{ color: 'red', padding: 8, background: '#fee' }}>{error.remove}</div>}
-        {pending.load ? <h2>Loading ...</h2> : error.load ? <h2>{error.load}</h2>:
-            expenses.length === 0 ? "No expenses yet" :
-            <>  
-                <div 
-                    id="tableHeader" 
-                    className="grid grid-cols-5 h-10 items-center bg-blue-100 rounded-t-md mt-5"
-                >
-                    {columns.map(c => {
-                        const arrIconClass = c.sortable ? 
-                                    c.field === query.sortBy && query.sortOrder === "asc" ? "up" :
-                                    c.field === query.sortBy && query.sortOrder === "desc" ? "down" : 
-                                    "default" 
-                                : "";
-                        return (
-                            <div 
-                                key={c.label} 
-                                className={"flex justify-between ps-5 pe-10 font-bold " + (c.sortable ? 'cursor-pointer' : '')}
-                                onClick={() => {
-                                    if(c.sortable) return setSortBy(c.field ?? "")
-                                }}
-                            >
-                                <span>{c.label}</span>
-                                <span className={arrIconClass}></span>
-                            </div>
-                        )
-                    })}
-                </div>
-                {expenses.map(e => <ExpenseItem key={e.id} expense={e} current={current} updateCurrent={updateCurrent} remove={remove} pending={pending} />)}
-            </>
-        }
-        <Pagination pagination={pagination} goToPage={setCurrentPage} />
+            <div className="flex justify-between">
+                <PageSizeSelector currentValue={pagination.pageSize} setPageSize={setPageSize} />               
+                <SearchInput setSearch={setSearch} />
+            </div>
+            <div>
+                {error.remove && <div style={{ color: 'red', padding: 8, background: '#fee' }}>{error.remove}</div>}
+                { pending.load ? <h2>Loading ...</h2> : error.load ? <h2>{error.load}</h2> : "" }
+            </div>
+            <div 
+                id="tableHeader" 
+                className="grid grid-cols-5 h-10 items-center bg-blue-100 rounded-t-md mt-5"
+            >
+                {columns.map(c => {
+                    const arrIconClass = c.sortable ? 
+                                c.field === query.sortBy && query.sortOrder === "asc" ? "up" :
+                                c.field === query.sortBy && query.sortOrder === "desc" ? "down" : 
+                                "default" 
+                            : "";
+                    return (
+                        <div 
+                            key={c.label} 
+                            className={"flex justify-between ps-5 pe-10 font-bold " + (c.sortable ? 'cursor-pointer' : '')}
+                            onClick={() => {
+                                if(c.sortable) return setSortBy(c.field ?? "")
+                            }}
+                        >
+                            <span>{c.label}</span>
+                            <span className={arrIconClass}></span>
+                        </div>
+                    )
+                })}
+            </div>
+            {
+                (expenses.length === 0 && !query.search) ? "No expenses yet" : (expenses.length === 0 && query.search) ? "No expenses found" :
+                <>                      
+                    {expenses.map(e => <ExpenseItem key={e.id} expense={e} current={current} updateCurrent={updateCurrent} remove={remove} pending={pending} />)}
+                </>
+            }
+            <Pagination pagination={pagination} goToPage={setCurrentPage} />
         </div>
     );
 }

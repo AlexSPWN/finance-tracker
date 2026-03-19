@@ -3,6 +3,7 @@ import { expenseService } from "../services/expenseService";
 import type { Expense, ExpenseExt, ExpenseFormProps, ExpenseQuery } from "../types/Expense";
 import type { ErrorState, Operations, PendingState } from "../types/Operations";
 import type { PaginationProp } from "../types/Pagination";
+import { useDebounce } from "./useDebounce";
 
 const expenseReducer = (
     state: ExpenseExt[],
@@ -65,8 +66,9 @@ export const useExpenses = () => {
             }
             // if DESC: remove sorting
             return {
-                page: prev.page,
-                pageSize: prev.pageSize
+                ...prev,
+                sortBy: undefined,
+                sortOrder: undefined
             };
         } )
     }
@@ -74,6 +76,34 @@ export const useExpenses = () => {
     /* const setSortOrder = (sortOrder?: "asc" | "desc") => {
         setQuery(prev => ({...prev, sortOrder}))
     } */
+
+    const [rawSearch, setRawSearch] = useState<string | undefined>("");
+    const debounceSearch = useDebounce(rawSearch, 500);
+
+    useEffect(() => {
+        setQuery(prev => ({
+            ...prev,
+            page: 1,
+            search: debounceSearch || undefined
+        }));
+    }, [debounceSearch]);
+
+    const setSearch = useCallback((searchText?: string) => {
+        setRawSearch(searchText);
+    }, []);
+
+    /* const setSearch = useCallback((searchText?: string) => {
+        setQuery(prev => {
+            if(searchText) return {
+                ...prev,
+                search: searchText
+            }
+            return {
+                ...prev,
+                search: undefined
+            }
+        })
+    }, []); */
 
     const [pending, setPending] = useState<PendingState>({
             load: false,
@@ -214,7 +244,7 @@ export const useExpenses = () => {
         expenses: optimisticExpenses, 
         current, updateCurrent,
         pagination, setCurrentPage, setPageSize, 
-        query, setSortBy, 
+        query, setSortBy, setSearch,
         //setSortOrder,
         add, update, remove,
         pending,

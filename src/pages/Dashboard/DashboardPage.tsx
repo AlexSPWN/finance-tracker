@@ -7,7 +7,7 @@ export const DashboardPage = () => {
     const {expenses, current, updateCurrent, 
         add, update, remove,
         pagination, setCurrentPage, setPageSize, 
-        query, setSortBy,
+        query, setSortBy, setSearch,
         // setSortOrder,
         pending, error} = useExpenses();
 
@@ -26,7 +26,7 @@ export const DashboardPage = () => {
                     pagination={pagination} 
                     remove={remove}
                     setCurrentPage={setCurrentPage} setPageSize={setPageSize}
-                    query={query} setSortBy={setSortBy}
+                    query={query} setSortBy={setSortBy} setSearch={setSearch}
                     error={error} pending={pending} />
             </div>
         </div>

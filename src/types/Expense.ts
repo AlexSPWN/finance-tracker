@@ -36,4 +36,5 @@ export type ExpenseQuery = {
     pageSize?: number;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+    search?: string;
 }
